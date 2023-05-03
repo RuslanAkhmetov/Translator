@@ -1,4 +1,4 @@
-package ru.geekbrain.android.translator.presenter
+package ru.geekbrain.android.translator.interactor
 
 import io.reactivex.Observable
 import ru.geekbrain.android.translator.data.AppState
