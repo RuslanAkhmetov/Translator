@@ -2,7 +2,7 @@ package ru.geekbrain.android.translator.domain
 
 import io.reactivex.Observable
 import ru.geekbrain.android.translator.data.Word
-import ru.geekbrain.android.translator.ui.TranslatorContract
+import ru.geekbrain.android.translator.model.TranslatorContract
 
 class DataSourceLocal(private val localProvider: RoomDataBaseImpl= RoomDataBaseImpl())
     : TranslatorContract.DataSource<List<Word>> {

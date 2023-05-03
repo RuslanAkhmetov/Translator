@@ -16,6 +16,7 @@
     <dimen name="margin_xxx_large">45dp</dimen>
     //Text size
     <dimen name="text_size_tip">10sp</dimen>
+    <dimen name="text_size_prim">14sp</dimen>
     <dimen name="text_size_standard">17sp</dimen>
     <dimen name="text_size_standard_header">20sp</dimen>
     <dimen name="text_size_large">25sp</dimen>

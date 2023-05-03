@@ -1,18 +1,16 @@
-package ru.geekbrain.android.translator
+package ru.geekbrain.android.translator.ui
 
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import ru.geekbrain.android.translator.R
 import ru.geekbrain.android.translator.data.AppState
 import ru.geekbrain.android.translator.data.Word
 import ru.geekbrain.android.translator.databinding.ActivityMainBinding
 import ru.geekbrain.android.translator.domain.ImageLoaderImpl
 import ru.geekbrain.android.translator.presenter.MainPresenterImpl
-import ru.geekbrain.android.translator.ui.BaseActivity
-import ru.geekbrain.android.translator.ui.MainAdapter
-import ru.geekbrain.android.translator.ui.SearchDialogFragment
-import ru.geekbrain.android.translator.ui.TranslatorContract
+import ru.geekbrain.android.translator.model.TranslatorContract
 
 class MainActivity : BaseActivity<AppState>() {
 

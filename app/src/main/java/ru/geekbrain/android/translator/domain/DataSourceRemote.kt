@@ -2,7 +2,7 @@ package ru.geekbrain.android.translator.domain
 
 import io.reactivex.Observable
 import ru.geekbrain.android.translator.data.Word
-import ru.geekbrain.android.translator.ui.TranslatorContract
+import ru.geekbrain.android.translator.model.TranslatorContract
 
 class DataSourceRemote (private val remoteProvider: RetrofitImpl = RetrofitImpl())
     : TranslatorContract.DataSource<List<Word>>{

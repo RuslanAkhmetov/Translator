@@ -1,9 +1,9 @@
-package ru.geekbrain.android.translator.domain
+package ru.geekbrain.android.translator.presenter
 
 import io.reactivex.Observable
 import ru.geekbrain.android.translator.data.AppState
 import ru.geekbrain.android.translator.data.Word
-import ru.geekbrain.android.translator.ui.TranslatorContract
+import ru.geekbrain.android.translator.model.TranslatorContract
 
 class MainInteractor(
     private val remoteRepository: TranslatorContract.Repository<List<Word>>,

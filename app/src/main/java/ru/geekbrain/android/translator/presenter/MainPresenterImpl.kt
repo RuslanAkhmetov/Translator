@@ -6,7 +6,7 @@ import ru.geekbrain.android.translator.data.AppState
 import ru.geekbrain.android.translator.domain.*
 import ru.geekbrain.android.translator.model.ScheduleProvider
 import ru.geekbrain.android.translator.rx.SchedulerProviderImpl
-import ru.geekbrain.android.translator.ui.TranslatorContract
+import ru.geekbrain.android.translator.model.TranslatorContract
 
 class MainPresenterImpl<T: AppState, V: TranslatorContract.View>(
     private val interactor: MainInteractor = MainInteractor(

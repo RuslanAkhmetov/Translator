@@ -9,7 +9,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import ru.geekbrain.android.translator.data.Word
 import ru.geekbrain.android.translator.model.ApiService
-import ru.geekbrain.android.translator.ui.TranslatorContract
+import ru.geekbrain.android.translator.model.TranslatorContract
 
 class RetrofitImpl : TranslatorContract.DataSource<List<Word>> {
     companion object{

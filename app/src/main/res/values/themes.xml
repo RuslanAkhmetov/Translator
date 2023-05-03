@@ -27,6 +27,12 @@
         <item name="android:textStyle">normal</item>
     </style>
 
+    <style name="PartOfSpeechTextStyle" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textSize">@dimen/text_size_prim</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
     <style name="HeaderTextStyle" parent="BaseTextStyle">
         <item name="android:textColor">@color/color_text_header</item>
         <item name="android:textSize">@dimen/text_size_standard_header</item>

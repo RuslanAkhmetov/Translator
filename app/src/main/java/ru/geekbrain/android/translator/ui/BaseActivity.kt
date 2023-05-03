@@ -3,6 +3,7 @@ package ru.geekbrain.android.translator.ui
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import ru.geekbrain.android.translator.data.AppState
+import ru.geekbrain.android.translator.model.TranslatorContract
 
 abstract class BaseActivity<T:AppState> : AppCompatActivity(), TranslatorContract.View{
 

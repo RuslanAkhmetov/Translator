@@ -17,7 +17,7 @@ class BaseInterceptor private constructor(): Interceptor{
         return response
     }
 
-    fun getResponseCode(): ServerResponseStatusCode=
+    fun getResponseCode(): ServerResponseStatusCode =
         when(responseCode /100){
             1-> ServerResponseStatusCode.INFO
             2-> ServerResponseStatusCode.SUCCESS

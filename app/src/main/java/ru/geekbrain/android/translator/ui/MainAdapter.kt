@@ -29,8 +29,10 @@ class MainAdapter(
                     word.text
                 itemView.findViewById<TextView>(R.id.description_textview_recycler_item).text =
                     word.meanings?.get(0)?.translation?.text
-                imageLoader.loadInto("https:"+word.meanings.get(0).imageUrl,
-                    itemView.findViewById<ImageView>(R.id.imageview_picture))
+                itemView.findViewById<TextView>(R.id.textview_part_of_speech).text =
+                    word.meanings?.get(0)?.partOfSpeechCode
+                //imageLoader.loadInto("https:"+word.meanings.get(0).imageUrl,
+                //    itemView.findViewById<ImageView>(R.id.imageview_picture))
                 itemView.setOnClickListener({openInNewWindow(word)})
             }
         }
