@@ -3,22 +3,21 @@ package ru.geekbrain.android.translator.viewmodel
 import androidx.lifecycle.LiveData
 import io.reactivex.observers.DisposableObserver
 import ru.geekbrain.android.translator.data.AppState
-import ru.geekbrain.android.translator.domain.DataSourceLocal
-import ru.geekbrain.android.translator.domain.DataSourceRemote
-import ru.geekbrain.android.translator.domain.RepositoryImpl
 import ru.geekbrain.android.translator.model.BaseViewModel
 import ru.geekbrain.android.translator.interactor.MainInteractor
+import ru.geekbrain.android.translator.utils.parseSearchResults
+import javax.inject.Inject
 
-class MainViewModel(
-    private val interactor: MainInteractor = MainInteractor(
-        RepositoryImpl(DataSourceRemote()),
-        RepositoryImpl(DataSourceLocal())
-    )
-) : BaseViewModel<AppState>(){
+class MainViewModel @Inject constructor(private val interactor: MainInteractor)
+ : BaseViewModel<AppState>(){
 
     private var appState:AppState? = null
 
-    override fun getWord(searchText: String, isOnline: Boolean): LiveData<AppState> {
+    fun subscribe(): LiveData<AppState> =
+         liveDataForViewToObserve
+
+
+    override fun getWord(searchText: String, isOnline: Boolean){
         compositeDisposable.add(
             interactor.getWord(searchText, isOnline)
                 .subscribeOn(scheduleProvider.io())
@@ -26,13 +25,13 @@ class MainViewModel(
                 .doOnSubscribe{liveDataForViewToObserve.value = AppState.Loading(null)}
                 .subscribeWith(getObserver())
         )
-        return super.getWord(searchText, isOnline)
+
     }
 
     private fun getObserver(): DisposableObserver<in AppState> =
         object : DisposableObserver<AppState>(){
             override fun onNext(state: AppState) {
-                appState = state
+                appState = parseSearchResults(state)
                 liveDataForViewToObserve.value = state
             }
 
@@ -44,5 +43,7 @@ class MainViewModel(
             }
 
         }
+
+
 
 }

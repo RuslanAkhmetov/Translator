@@ -15,16 +15,7 @@
         android:layout_marginStart="@dimen/margin_medium"
         tools:text="Header" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:id="@+id/textview_part_of_speech"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style ="@style/PartOfSpeechTextStyle"
-            android:layout_marginStart="@dimen/margin_small"/>
+
 
         <TextView
             android:id="@+id/description_textview_recycler_item"
@@ -36,7 +27,6 @@
     adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
     aliqua." />
 
-    </LinearLayout>
 
 
     <ImageView
@@ -44,7 +34,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <View xmlns:android="http://schemas.android.com/apk/res/android"
+    <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/hairline"
         android:layout_marginTop="@dimen/margin_small"

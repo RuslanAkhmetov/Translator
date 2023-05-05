@@ -4,34 +4,35 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.android.AndroidInjection
 import ru.geekbrain.android.translator.R
 import ru.geekbrain.android.translator.data.AppState
 import ru.geekbrain.android.translator.data.Word
 import ru.geekbrain.android.translator.databinding.ActivityMainBinding
-import ru.geekbrain.android.translator.domain.ImageLoaderImpl
+import ru.geekbrain.android.translator.di.ViewModelFactory
 import ru.geekbrain.android.translator.model.BaseActivity
-import ru.geekbrain.android.translator.model.BaseViewModel
 import ru.geekbrain.android.translator.viewmodel.MainViewModel
+import javax.inject.Inject
 
 class MainActivity : BaseActivity<AppState>() {
 
-    companion object{
+    companion object {
         private const val BOTTOM_SHEET_FRAGMENT_DIALOG_TAG =
             "74a54328-5d62-46bf-ab6b-cbf5fgt0-092395"
 
     }
 
-    override val model: BaseViewModel<AppState> by lazy{
-        ViewModelProvider.NewInstanceFactory().create(MainViewModel::class.java)
-    }
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
 
-    private val observer = Observer<AppState>{renderData(it)}
+    override lateinit var model: MainViewModel
+
+    private val observer = Observer<AppState> { renderData(it) }
 
     private lateinit var binding: ActivityMainBinding
 
-    private var adapter: MainAdapter? = null
+    private val adapter: MainAdapter by lazy { MainAdapter(onListItemClickListener) }
 
     private val onListItemClickListener: MainAdapter.OnListItemClickListener =
         object : MainAdapter.OnListItemClickListener {
@@ -43,53 +44,53 @@ class MainActivity : BaseActivity<AppState>() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        model = viewModelFactory.create(MainViewModel::class.java)
+
+        model.subscribe().observe(this@MainActivity, observer)
+
         binding.searchFab.setOnClickListener {
             val searchDialogFragment = SearchDialogFragment.newInstance()
             searchDialogFragment.setOnSearchClickListener(
                 object : SearchDialogFragment.OnSearchClickListener {
                     override fun onClick(searchWord: String) {
                         model.getWord(searchWord, true)
-                            .observe(this@MainActivity, observer)
                     }
 
-                 }
+                }
             )
             searchDialogFragment.show(supportFragmentManager, BOTTOM_SHEET_FRAGMENT_DIALOG_TAG)
         }
+        binding.mainActivityRecyclerview.layoutManager =
+            LinearLayoutManager(applicationContext)
+        binding.mainActivityRecyclerview.adapter = adapter
     }
-
 
 
     override fun renderData(appState: AppState) {
         when (appState) {
             is AppState.Success -> {
                 val word = appState.words
-                if (word == null || word.isEmpty()) {
+                if (word.isNullOrEmpty()) {
                     showErrorScreen(getString(R.string.empty_server_response_on_success))
                 } else {
                     showViewSuccess()
-                    if(adapter == null){
-                        binding.mainActivityRecyclerview.layoutManager =
-                            LinearLayoutManager(applicationContext)
-                        binding.mainActivityRecyclerview.adapter =
-                            MainAdapter(onListItemClickListener, word, ImageLoaderImpl())
-                    } else{
-                        adapter!!.setData(word)
-                    }
+                    adapter.setData(word)
 
                 }
 
             }
             is AppState.Loading -> {
                 showViewLoading()
-                if (appState.progress != null){
+                if (appState.progress != null) {
                     binding.progressBarHorizontal.visibility = View.VISIBLE
                     binding.progressBarRound.visibility = View.GONE
                     binding.progressBarHorizontal.progress = appState.progress
-                } else{
+                } else {
                     binding.progressBarHorizontal.visibility = View.GONE
                     binding.progressBarRound.visibility = View.VISIBLE
                 }
@@ -100,21 +101,21 @@ class MainActivity : BaseActivity<AppState>() {
 
     private fun showViewLoading() {
         binding.successLinearLayout.visibility = View.GONE
-        binding.loadingFrameLayout.visibility =  View.VISIBLE
+        binding.loadingFrameLayout.visibility = View.VISIBLE
         binding.errorLinearLayout.visibility = View.GONE
     }
 
     private fun showViewSuccess() {
         binding.successLinearLayout.visibility = View.VISIBLE
-        binding.loadingFrameLayout.visibility =  View.GONE
+        binding.loadingFrameLayout.visibility = View.GONE
         binding.errorLinearLayout.visibility = View.GONE
     }
 
     private fun showErrorScreen(error: String?) {
         showViewError()
         binding.errorTextview.text = error ?: getString(R.string.undefined_error)
-        binding.reloadButton.setOnClickListener{
-            model.getWord("hi", true).observe(this, observer)
+        binding.reloadButton.setOnClickListener {
+            model.getWord("hi", true)
         }
 
     }
@@ -122,10 +123,9 @@ class MainActivity : BaseActivity<AppState>() {
 
     private fun showViewError() {
         binding.successLinearLayout.visibility = View.GONE
-        binding.loadingFrameLayout.visibility =  View.GONE
+        binding.loadingFrameLayout.visibility = View.GONE
         binding.errorLinearLayout.visibility = View.VISIBLE
     }
-
 
 
 }
