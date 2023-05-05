@@ -20,6 +20,7 @@ class MainActivity : BaseActivity<AppState>() {
     companion object {
         private const val BOTTOM_SHEET_FRAGMENT_DIALOG_TAG =
             "74a54328-5d62-46bf-ab6b-cbf5fgt0-092395"
+        private const val ALLERT_DIALOG_TAG = "alertDialog"
 
     }
 
@@ -39,7 +40,6 @@ class MainActivity : BaseActivity<AppState>() {
             override fun onItemClick(word: Word) {
                 Toast.makeText(this@MainActivity, word.text, Toast.LENGTH_SHORT).show()
             }
-
         }
 
 
@@ -55,6 +55,7 @@ class MainActivity : BaseActivity<AppState>() {
 
         binding.searchFab.setOnClickListener {
             val searchDialogFragment = SearchDialogFragment.newInstance()
+
             searchDialogFragment.setOnSearchClickListener(
                 object : SearchDialogFragment.OnSearchClickListener {
                     override fun onClick(searchWord: String) {
@@ -65,6 +66,7 @@ class MainActivity : BaseActivity<AppState>() {
             )
             searchDialogFragment.show(supportFragmentManager, BOTTOM_SHEET_FRAGMENT_DIALOG_TAG)
         }
+
         binding.mainActivityRecyclerview.layoutManager =
             LinearLayoutManager(applicationContext)
         binding.mainActivityRecyclerview.adapter = adapter
@@ -80,7 +82,6 @@ class MainActivity : BaseActivity<AppState>() {
                 } else {
                     showViewSuccess()
                     adapter.setData(word)
-
                 }
 
             }
@@ -95,8 +96,17 @@ class MainActivity : BaseActivity<AppState>() {
                     binding.progressBarRound.visibility = View.VISIBLE
                 }
             }
-            is AppState.Error -> showErrorScreen(appState.error.message)
+            is AppState.Error -> {
+                showViewWorking()
+                AlertDialogFragment
+                    .newInstance(getString(R.string.error_textview_stub), appState.error.message)
+                    .show(supportFragmentManager, ALLERT_DIALOG_TAG)
+            }
         }
+    }
+
+    private fun showViewWorking() {
+        binding.loadingFrameLayout.visibility = View.GONE
     }
 
     private fun showViewLoading() {
