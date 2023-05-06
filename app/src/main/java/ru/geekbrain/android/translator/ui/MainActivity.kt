@@ -21,7 +21,8 @@ class MainActivity : BaseActivity<AppState>() {
         private const val BOTTOM_SHEET_FRAGMENT_DIALOG_TAG =
             "74a54328-5d62-46bf-ab6b-cbf5fgt0-092395"
         private const val ALLERT_DIALOG_TAG = "alertDialog"
-
+        private const val SEARCH_WORD = "searchWord"
+        private const val TAG = "MainActivity"
     }
 
     @Inject
@@ -34,6 +35,8 @@ class MainActivity : BaseActivity<AppState>() {
     private lateinit var binding: ActivityMainBinding
 
     private val adapter: MainAdapter by lazy { MainAdapter(onListItemClickListener) }
+
+    private  var lastSearchWord : String = ""
 
     private val onListItemClickListener: MainAdapter.OnListItemClickListener =
         object : MainAdapter.OnListItemClickListener {
@@ -53,6 +56,12 @@ class MainActivity : BaseActivity<AppState>() {
 
         model.subscribe().observe(this@MainActivity, observer)
 
+        savedInstanceState?.apply {
+            this.getString(SEARCH_WORD)?.let { textWord ->
+                model.getWord(textWord, true)
+            }
+        }
+
         binding.searchFab.setOnClickListener {
             val searchDialogFragment = SearchDialogFragment.newInstance()
 
@@ -60,6 +69,8 @@ class MainActivity : BaseActivity<AppState>() {
                 object : SearchDialogFragment.OnSearchClickListener {
                     override fun onClick(searchWord: String) {
                         model.getWord(searchWord, true)
+                        lastSearchWord = searchWord
+
                     }
 
                 }
@@ -70,6 +81,11 @@ class MainActivity : BaseActivity<AppState>() {
         binding.mainActivityRecyclerview.layoutManager =
             LinearLayoutManager(applicationContext)
         binding.mainActivityRecyclerview.adapter = adapter
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(SEARCH_WORD, lastSearchWord)
     }
 
 
@@ -101,6 +117,7 @@ class MainActivity : BaseActivity<AppState>() {
                 AlertDialogFragment
                     .newInstance(getString(R.string.error_textview_stub), appState.error.message)
                     .show(supportFragmentManager, ALLERT_DIALOG_TAG)
+                showViewSuccess()
             }
         }
     }
