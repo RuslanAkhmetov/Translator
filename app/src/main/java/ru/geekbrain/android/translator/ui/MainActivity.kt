@@ -3,17 +3,14 @@ package ru.geekbrain.android.translator.ui
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import dagger.android.AndroidInjection
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.geekbrain.android.translator.R
 import ru.geekbrain.android.translator.data.AppState
 import ru.geekbrain.android.translator.data.Word
 import ru.geekbrain.android.translator.databinding.ActivityMainBinding
-import ru.geekbrain.android.translator.di.ViewModelFactory
 import ru.geekbrain.android.translator.model.BaseActivity
 import ru.geekbrain.android.translator.viewmodel.MainViewModel
-import javax.inject.Inject
 
 class MainActivity : BaseActivity<AppState>() {
 
@@ -25,18 +22,46 @@ class MainActivity : BaseActivity<AppState>() {
         private const val TAG = "MainActivity"
     }
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+
 
     override lateinit var model: MainViewModel
-
-    private val observer = Observer<AppState> { renderData(it) }
 
     private lateinit var binding: ActivityMainBinding
 
     private val adapter: MainAdapter by lazy { MainAdapter(onListItemClickListener) }
 
     private  var lastSearchWord : String = ""
+
+    private fun initViewModel(){
+        if(binding.mainActivityRecyclerview.adapter != null){
+            throw IllegalStateException("ViewModel should be initialized")
+        }
+        val viewModel: MainViewModel by viewModel()
+        model = viewModel
+        model.subscribe().observe(this, { renderData(it) })
+    }
+
+    private fun initViews(){
+        binding.searchFab.setOnClickListener {
+            val searchDialogFragment = SearchDialogFragment.newInstance()
+            searchDialogFragment.setOnSearchClickListener(
+                object : SearchDialogFragment.OnSearchClickListener {
+                    override fun onClick(searchWord: String) {
+                        model.getWord(searchWord, true)
+                        lastSearchWord = searchWord
+                    }
+                }
+            )
+            searchDialogFragment.show(supportFragmentManager, BOTTOM_SHEET_FRAGMENT_DIALOG_TAG)
+        }
+
+        binding.mainActivityRecyclerview.layoutManager =
+            LinearLayoutManager(applicationContext)
+
+        binding.mainActivityRecyclerview.adapter = adapter
+
+
+    }
 
     private val onListItemClickListener: MainAdapter.OnListItemClickListener =
         object : MainAdapter.OnListItemClickListener {
@@ -47,14 +72,11 @@ class MainActivity : BaseActivity<AppState>() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        model = viewModelFactory.create(MainViewModel::class.java)
-
-        model.subscribe().observe(this@MainActivity, observer)
+        initViewModel()
+        initViews()
 
         savedInstanceState?.apply {
             this.getString(SEARCH_WORD)?.let { textWord ->
@@ -62,25 +84,9 @@ class MainActivity : BaseActivity<AppState>() {
             }
         }
 
-        binding.searchFab.setOnClickListener {
-            val searchDialogFragment = SearchDialogFragment.newInstance()
 
-            searchDialogFragment.setOnSearchClickListener(
-                object : SearchDialogFragment.OnSearchClickListener {
-                    override fun onClick(searchWord: String) {
-                        model.getWord(searchWord, true)
-                        lastSearchWord = searchWord
 
-                    }
 
-                }
-            )
-            searchDialogFragment.show(supportFragmentManager, BOTTOM_SHEET_FRAGMENT_DIALOG_TAG)
-        }
-
-        binding.mainActivityRecyclerview.layoutManager =
-            LinearLayoutManager(applicationContext)
-        binding.mainActivityRecyclerview.adapter = adapter
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

@@ -3,12 +3,11 @@ package ru.geekbrain.android.translator.viewmodel
 import androidx.lifecycle.LiveData
 import io.reactivex.observers.DisposableObserver
 import ru.geekbrain.android.translator.data.AppState
-import ru.geekbrain.android.translator.model.BaseViewModel
 import ru.geekbrain.android.translator.interactor.MainInteractor
+import ru.geekbrain.android.translator.model.BaseViewModel
 import ru.geekbrain.android.translator.utils.parseSearchResults
-import javax.inject.Inject
 
-class MainViewModel @Inject constructor(private val interactor: MainInteractor)
+class MainViewModel (private val interactor: MainInteractor)
  : BaseViewModel<AppState>(){
 
     private var appState:AppState? = null
