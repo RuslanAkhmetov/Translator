@@ -1,7 +1,6 @@
 package ru.geekbrain.android.translator.domain
 
-import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import io.reactivex.Observable
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -18,8 +17,8 @@ class RetrofitImpl : TranslatorContract.DataSource<List<Word>> {
 
     }
 
-    override fun getWord(searchText: String): Observable<List<Word>> =
-        getService(BaseInterceptor.interceptor).search(searchText)
+    override suspend fun getWord(searchText: String): List<Word> =
+        getService(BaseInterceptor.interceptor).searchAsync(searchText).await()
 
 
     private fun getService(interceptor: Interceptor): ApiService =
@@ -30,7 +29,7 @@ class RetrofitImpl : TranslatorContract.DataSource<List<Word>> {
         Retrofit.Builder()
             .baseUrl(BASE_URL_LOCATIONS)
             .addConverterFactory(GsonConverterFactory.create())
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .client(createOkHttpClient(interceptor))
             .build()
 

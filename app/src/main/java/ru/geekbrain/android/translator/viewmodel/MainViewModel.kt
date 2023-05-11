@@ -1,7 +1,9 @@
 package ru.geekbrain.android.translator.viewmodel
 
 import androidx.lifecycle.LiveData
-import io.reactivex.observers.DisposableObserver
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.geekbrain.android.translator.data.AppState
 import ru.geekbrain.android.translator.interactor.MainInteractor
 import ru.geekbrain.android.translator.model.BaseViewModel
@@ -10,39 +12,32 @@ import ru.geekbrain.android.translator.utils.parseSearchResults
 class MainViewModel (private val interactor: MainInteractor)
  : BaseViewModel<AppState>(){
 
-    private var appState:AppState? = null
+    private val liveDataForViewToObserve: LiveData<AppState> = _mutableLiveData
+
 
     fun subscribe(): LiveData<AppState> =
-         liveDataForViewToObserve
-
+        liveDataForViewToObserve
 
     override fun getWord(searchText: String, isOnline: Boolean){
-        compositeDisposable.add(
-            interactor.getWord(searchText, isOnline)
-                .subscribeOn(scheduleProvider.io())
-                .observeOn(scheduleProvider.ui())
-                .doOnSubscribe{liveDataForViewToObserve.value = AppState.Loading(null)}
-                .subscribeWith(getObserver())
-        )
+        _mutableLiveData.value = AppState.Loading(null)
+        cancelJob()
+        viewModelCoroutineScope.launch { startInteractor(searchText, isOnline) }
 
     }
 
-    private fun getObserver(): DisposableObserver<in AppState> =
-        object : DisposableObserver<AppState>(){
-            override fun onNext(state: AppState) {
-                appState = parseSearchResults(state)
-                liveDataForViewToObserve.value = state
-            }
-
-            override fun onError(e: Throwable) {
-                liveDataForViewToObserve.value = AppState.Error(e)
-            }
-
-            override fun onComplete() {
-            }
-
+    private suspend fun startInteractor(searchText: String, online: Boolean) =
+        withContext(Dispatchers.IO){
+            _mutableLiveData.postValue(parseSearchResults(interactor.getWord(searchText, online)))
         }
 
+    override fun handleError(throwable: Throwable) {
+        _mutableLiveData.postValue(AppState.Error(throwable))
+    }
+
+    override fun onCleared() {
+        _mutableLiveData.value = AppState.Success(null)
+        super.onCleared()
+    }
 
 
 }
