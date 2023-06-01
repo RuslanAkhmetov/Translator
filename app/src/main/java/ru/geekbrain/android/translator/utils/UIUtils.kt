@@ -9,12 +9,15 @@ fun getStubAlertDialog(context: Context): AlertDialog {
     return getAlertDialog(context, null, null)
 }
 
-fun getAlertDialog(context: Context, title: String?, message: String?): AlertDialog {
-    val finalTitle = title ?: context.getString(R.string.error_textview_stub)
-    val finalMessage = message ?: ""
-
-    return AlertDialog.Builder(context)
-        .setTitle(finalTitle)
-        .setMessage(finalMessage)
+fun getAlertDialog(context: Context, title: String?, message: String?): AlertDialog =
+     AlertDialog.Builder(context)
+        .setCancelable(true)
+        .setPositiveButton(R.string.dialog_button_cancell){dialog, _ -> dialog.dismiss()}
+        .setTitle(title ?: context.getString(R.string.error_textview_stub))
+        .setMessage(message ?: "")
         .create()
-}
+
+
+
+
+

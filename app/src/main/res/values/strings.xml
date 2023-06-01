@@ -8,4 +8,11 @@ empty</string>
     <string name="button_search">Search</string>
     <string name="search_hint">New word</string>
     <string name="delete_description">X</string>
+    <string name="image_stub">Image stub</string>
+    <string name="dialog_title_device_is_offline">Device is offline</string>
+    <string name="dialog_message_device_is_offline">Device is offline please check internet access</string>
+    <string name="dialog_title_sorry">Network error</string>
+    <string name="empty_server_response">Server response is empty</string>
+    <string name="history_menu">History menu</string>
+    <string name="dialog_button_cancell">Cancell</string>
 </resources>

@@ -1,8 +1,10 @@
 package ru.geekbrain.android.translator
 
 import android.app.Application
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import ru.geekbrain.android.translator.di.application
+import ru.geekbrain.android.translator.di.historyScreen
 import ru.geekbrain.android.translator.di.mainScreen
 
 class TranslatorApp : Application() {
@@ -10,8 +12,10 @@ class TranslatorApp : Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin{
-            modules(listOf(application, mainScreen))
+            androidContext(applicationContext)
+            modules(listOf(application, mainScreen, historyScreen))
 
             }
         }
+
     }
