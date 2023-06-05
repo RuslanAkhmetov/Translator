@@ -6,15 +6,15 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import ru.geekbrain.android.translator.R
-import ru.geekbrain.android.translator.model.data.AppState
-import ru.geekbrain.android.translator.model.data.Word
-import ru.geekbrain.android.translator.databinding.ActivityMainBinding
-import ru.geekbrain.android.translator.view.history.HistoryActivity
 import ru.geekbrain.android.translator.view.descriptionscreen.DescriptionActivity
 import ru.geekbrain.android.translator.view.main.adapter.MainAdapter
-import ru.geekbrain.android.translator.utils.convertMeaningsToString
-import ru.geekbrain.android.translator.view.base.BaseActivity
+import ru.geekbrain.android.core.BaseActivity
+import ru.geekbrain.android.historyscreen.view.history.HistoryActivity
+import ru.geekbrain.android.model.AppState
+import ru.geekbrain.android.model.Word
+import ru.geekbrain.android.repository.convertMeaningsToString
+import ru.geekbrains.android.translator.R
+import ru.geekbrains.android.translator.databinding.ActivityMainBinding
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class MainActivity : BaseActivity<AppState, MainInteractor>() {
@@ -41,8 +41,6 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         setContentView(binding.root)
         initViewModel()
         initViews()
-
-
     }
 
     private fun initViewModel(){
@@ -50,6 +48,8 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
             throw IllegalStateException("ViewModel should be initialized")
         }
         val viewModel: MainViewModel by viewModel()
+
+
         model = viewModel
         model.subscribe().observe(this, Observer<AppState> { renderData(it) })
     }
@@ -107,13 +107,9 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         }
     }
 
-
-
     override fun setDataToAdapter(word: List<Word>) {
         adapter.setData(word)
     }
-
-
 
 
 }

@@ -2,26 +2,16 @@ package ru.geekbrain.android.translator.view.descriptionscreen
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import coil.ImageLoader
 import coil.request.LoadRequest
 import coil.transform.CircleCropTransformation
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.Target
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
-import ru.geekbrain.android.translator.R
-import ru.geekbrain.android.translator.databinding.ActivityDescriptionBinding
-import ru.geekbrain.android.translator.utils.AlertDialogFragment
-import ru.geekbrain.android.translator.utils.isOnline
-import java.lang.Exception
+import ru.geekbrain.android.utils.AlertDialogFragment
+import ru.geekbrain.android.utils.isOnline
+import ru.geekbrains.android.translator.R
+import ru.geekbrains.android.translator.databinding.ActivityDescriptionBinding
 
 class DescriptionActivity : AppCompatActivity() {
     companion object {
@@ -91,7 +81,7 @@ class DescriptionActivity : AppCompatActivity() {
                 stopRefreshAnimatorIfNeeded()
             } else {
                 //useGlideToLoadPhoto(binding.descriptionImageview, it)
-                useCoilToLoadPhoto(binding.descriptionImageview, it)
+                useCoilToLoadPhoto(binding.descriptionImageview , it)
             }
 
         }
@@ -128,55 +118,5 @@ class DescriptionActivity : AppCompatActivity() {
         imageLoader.execute(request)
     }
 
-    private fun useGlideToLoadPhoto(imageView: ImageView, imageLink: String) {
-        Glide.with(imageView)
-            .load("https:$imageLink")
-            .listener(object : RequestListener<Drawable> {
-                override fun onLoadFailed(
-                    e: GlideException?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    stopRefreshAnimatorIfNeeded()
-                    imageView.setImageResource(R.drawable.ic_load_error_vector)
-                    return false
-                }
 
-                override fun onResourceReady(
-                    resource: Drawable?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    dataSource: DataSource?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    stopRefreshAnimatorIfNeeded()
-                    return false
-                }
-
-            }).apply(
-                RequestOptions()
-                    .placeholder(R.drawable.ic_no_photo_vector)
-                    .centerCrop()
-            ).into(imageView)
-    }
-
-    private fun usePicassoToLoadPhoto(imageView: ImageView, imageLink: String){
-        Picasso.get().load("https:$imageLink")
-            .placeholder(R.drawable.ic_no_photo_vector)
-            .fit()
-            .centerCrop()
-            .into(imageView, object : Callback {
-                override fun onSuccess() {
-                    stopRefreshAnimatorIfNeeded()
-                }
-
-                override fun onError(e: Exception?) {
-                    stopRefreshAnimatorIfNeeded()
-                    imageView.setImageResource(R.drawable.ic_load_error_vector)
-                }
-
-            })
-
-    }
 }

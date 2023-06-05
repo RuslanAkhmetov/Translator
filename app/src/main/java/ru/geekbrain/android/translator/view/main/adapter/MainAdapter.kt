@@ -5,16 +5,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import ru.geekbrain.android.translator.R
-import ru.geekbrain.android.translator.model.data.Word
-import ru.geekbrain.android.translator.utils.convertMeaningsToString
+import ru.geekbrain.android.model.Word
+import ru.geekbrain.android.repository.convertMeaningsToString
+import ru.geekbrains.android.translator.R
 
 class MainAdapter(
     private var onListItemClickListener: OnListItemClickListener
 ) : RecyclerView.Adapter<MainAdapter.RecyclerItemViewHolder>() {
 
-    /*@Inject
-    lateinit var imageLoader: ImageLoader<ImageView>*/
 
     private var words: List<Word> = arrayListOf()
 
@@ -26,7 +24,7 @@ class MainAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerItemViewHolder {
         return RecyclerItemViewHolder(
             LayoutInflater.from(parent.context)
-                .inflate(R.layout.activity_main_recyclerview_item, parent, false)
+                .inflate( R.layout.activity_main_recyclerview_item, parent, false)
                     as View
         )
     }

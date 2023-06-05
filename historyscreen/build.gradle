@@ -1,0 +1,38 @@
+//import android.widget.Switch
+
+plugins {
+    id("com.android.library")
+    id("org.jetbrains.kotlin.android")
+    id('kotlin-android')
+}
+
+
+dependencies {
+
+    implementation project(Modules.model)
+    implementation project(Modules.repository)
+    implementation project(Modules.core)
+    //Design
+    implementation Design.appcompat
+    implementation Design.material
+
+    //Kotlin
+    implementation Kotlin.core
+    implementation Kotlin.stdlib
+    implementation Kotlin.coroutines_core
+    implementation Kotlin.coroutines_android
+
+    //Koin
+    implementation Koin.koin_android
+    implementation Koin.koin_view_model
+
+    //Swipe
+    implementation Swipe.swiperefreshlayout
+
+    //Test
+    testImplementation TestImpl.junit
+    androidTestImplementation TestImpl.runner
+    androidTestImplementation TestImpl.espresso
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+}
+
