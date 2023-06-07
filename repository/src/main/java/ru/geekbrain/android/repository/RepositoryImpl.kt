@@ -1,11 +1,11 @@
 package ru.geekbrain.android.repository
 
-import ru.geekbrain.android.model.Word
+import ru.geekbrain.android.model.dto.WordDto
 
-class RepositoryImpl(private val dataSource: DataSource<List<Word>>)
-    : Repository<List<Word>>{
+class RepositoryImpl(private val dataSource: DataSource<List<WordDto>>)
+    : Repository<List<WordDto>>{
 
-    override suspend fun getWord(word: String): List<Word> =
+    override suspend fun getWord(word: String): List<WordDto> =
         dataSource.getWord(word)
 
 }

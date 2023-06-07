@@ -1,9 +1,9 @@
-package ru.geekbrain.android.model
+package ru.geekbrain.android.model.dto
 
 
 import com.google.gson.annotations.SerializedName
 
-data class Translation(
+data class TranslationDto(
     @SerializedName("note")
     val note: String,
     @SerializedName("text")

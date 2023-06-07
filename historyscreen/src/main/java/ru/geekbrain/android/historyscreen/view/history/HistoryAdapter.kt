@@ -7,7 +7,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import ru.geekbrain.android.historyscreen.R
-import ru.geekbrain.android.model.Word
+import ru.geekbrain.android.model.userdata.Word
 import ru.geekbrain.android.repository.convertMeaningsToString
 
 class HistoryAdapter : RecyclerView.Adapter<HistoryAdapter.RecyclerItemViewHolder>() {
@@ -23,7 +23,7 @@ class HistoryAdapter : RecyclerView.Adapter<HistoryAdapter.RecyclerItemViewHolde
                 }
 
                 itemView.setOnClickListener {
-                    Toast.makeText(itemView.context, "Word id: ${word.id}", Toast.LENGTH_SHORT)
+                    Toast.makeText(itemView.context, "WordDto id: ${word.id}", Toast.LENGTH_SHORT)
                         .show()
                 }
             }

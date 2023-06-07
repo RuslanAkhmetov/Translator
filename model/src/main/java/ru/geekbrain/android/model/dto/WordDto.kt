@@ -1,13 +1,12 @@
-package ru.geekbrain.android.model
-
+package ru.geekbrain.android.model.dto
 
 import com.google.gson.annotations.SerializedName
 
-class Word(
+data class WordDto(
     @SerializedName("id")
     val id: Int,
     @SerializedName("meanings")
-    val meanings: List<Meaning>?,
+    val meanings: List<MeaningDto>?,
     @SerializedName("text")
     val text: String
 )

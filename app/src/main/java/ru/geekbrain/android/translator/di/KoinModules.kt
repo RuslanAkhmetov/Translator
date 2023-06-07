@@ -1,8 +1,10 @@
 package ru.geekbrain.android.translator.di
 
 import androidx.room.Room
+import org.koin.android.viewmodel.dsl.viewModel
+import org.koin.core.qualifier.named
 
-import ru.geekbrain.android.model.Word
+import ru.geekbrain.android.model.dto.WordDto
 import ru.geekbrain.android.repository.RetrofitImpl
 import ru.geekbrain.android.repository.RoomDataBaseImpl
 import ru.geekbrain.android.repository.RepositoryImpl
@@ -15,30 +17,36 @@ import ru.geekbrain.android.historyscreen.view.history.HistoryViewModel
 import ru.geekbrain.android.translator.view.main.MainInteractor
 import ru.geekbrain.android.translator.view.main.MainViewModel
 import org.koin.dsl.module
+import ru.geekbrain.android.historyscreen.view.history.HistoryActivity
+import ru.geekbrain.android.translator.view.main.MainActivity
 
 val application = module {
-        single { Room.databaseBuilder(get(), HistoryDataBase::class.java, "HistoryDB").build() }
-        single { get<HistoryDataBase>().historyDao }
+    single { Room.databaseBuilder(get(), HistoryDataBase::class.java, "HistoryDB").build() }
+    single { get<HistoryDataBase>().historyDao }
 
-        single<Repository<List<Word>>> {
-            RepositoryImpl(RetrofitImpl())
-        }
-
-        single<RepositoryLocal<List<Word>>> {
-            RepositoryImplementationLocal(RoomDataBaseImpl(get()))
-        }
-
+    single<Repository<List<WordDto>>> {
+        RepositoryImpl(RetrofitImpl())
     }
+
+    single<RepositoryLocal<List<WordDto>>> {
+        RepositoryImplementationLocal(RoomDataBaseImpl(get()))
+    }
+
+}
 
 
 val mainScreen = module {
-    factory { MainViewModel(get()) }
-    factory { MainInteractor(get(), get()) }
+    scope(named<MainActivity>()) {
+        scoped { MainInteractor(get(), get()) }
+        viewModel { MainViewModel(get()) }
+    }
 }
 
 val historyScreen = module {
-    factory { HistoryViewModel(get()) }
-    factory { HistoryInteractor(get(), get()) }
+    scope(named<HistoryActivity>()) {
+        scoped { HistoryInteractor(get(), get()) }
+        viewModel { HistoryViewModel(get()) }
+    }
 }
 
 

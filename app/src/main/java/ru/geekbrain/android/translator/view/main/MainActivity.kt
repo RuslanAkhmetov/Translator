@@ -6,25 +6,25 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import org.koin.android.scope.currentScope
 import ru.geekbrain.android.translator.view.descriptionscreen.DescriptionActivity
 import ru.geekbrain.android.translator.view.main.adapter.MainAdapter
 import ru.geekbrain.android.core.BaseActivity
 import ru.geekbrain.android.historyscreen.view.history.HistoryActivity
 import ru.geekbrain.android.model.AppState
-import ru.geekbrain.android.model.Word
+import ru.geekbrain.android.model.userdata.Word
 import ru.geekbrain.android.repository.convertMeaningsToString
 import ru.geekbrains.android.translator.R
 import ru.geekbrains.android.translator.databinding.ActivityMainBinding
-import org.koin.android.viewmodel.ext.android.viewModel
+import ru.geekbrain.android.utils.view.viewById
 
 class MainActivity : BaseActivity<AppState, MainInteractor>() {
 
     companion object {
         private const val BOTTOM_SHEET_FRAGMENT_DIALOG_TAG =
             "74a54328-5d62-46bf-ab6b-cbf5fgt0-092395"
-        private const val ALLERT_DIALOG_TAG = "alertDialog"
-        private const val SEARCH_WORD = "searchWord"
-        private const val TAG = "MainActivity"
     }
 
     override lateinit var model: MainViewModel
@@ -35,6 +35,10 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
 
     private  var lastSearchWord : String = ""
 
+    private val mainActivityRecyclerview by viewById<RecyclerView>(R.id.main_activity_recyclerview)
+
+    private val searchFAB by viewById<FloatingActionButton>(R.id.search_fab)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -44,18 +48,17 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     }
 
     private fun initViewModel(){
-        if(binding.mainActivityRecyclerview.adapter != null){
+        if(mainActivityRecyclerview.adapter != null){
             throw IllegalStateException("ViewModel should be initialized")
         }
-        val viewModel: MainViewModel by viewModel()
-
+        val viewModel: MainViewModel by currentScope.inject()
 
         model = viewModel
-        model.subscribe().observe(this, Observer<AppState> { renderData(it) })
+        model.subscribe().observe(this,  { renderData(it) })
     }
 
     private fun initViews(){
-        binding.searchFab.setOnClickListener {
+        searchFAB.setOnClickListener {
             val searchDialogFragment = SearchDialogFragment.newInstance()
             searchDialogFragment.setOnSearchClickListener(
                 object : SearchDialogFragment.OnSearchClickListener {
@@ -68,10 +71,10 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
             searchDialogFragment.show(supportFragmentManager, BOTTOM_SHEET_FRAGMENT_DIALOG_TAG)
         }
 
-        binding.mainActivityRecyclerview.layoutManager =
+        mainActivityRecyclerview.layoutManager =
             LinearLayoutManager(applicationContext)
 
-        binding.mainActivityRecyclerview.adapter = adapter
+        mainActivityRecyclerview.adapter = adapter
     }
 
     private val onListItemClickListener: MainAdapter.OnListItemClickListener =

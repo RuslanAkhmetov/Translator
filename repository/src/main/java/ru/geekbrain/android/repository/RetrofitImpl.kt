@@ -6,18 +6,18 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import ru.geekbrain.android.model.Word
+import ru.geekbrain.android.model.dto.WordDto
 import ru.geekbrain.android.repository.api.BaseInterceptor
 import ru.geekbrain.android.translator.repository.api.ApiService
 
-class RetrofitImpl : DataSource<List<Word>> {
+class RetrofitImpl : DataSource<List<WordDto>> {
     companion object{
         private const val BASE_URL_LOCATIONS =
             "https://dictionary.skyeng.ru/api/public/v1/"
 
     }
 
-    override suspend fun getWord(searchText: String): List<Word> =
+    override suspend fun getWord(searchText: String): List<WordDto> =
         getService(BaseInterceptor.interceptor).searchAsync(searchText).await()
 
 

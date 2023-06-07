@@ -13,7 +13,6 @@ class MainViewModel (private val interactor: MainInteractor)
 
     private val liveDataForViewToObserve: LiveData<AppState> = _mutableLiveData
 
-
     fun subscribe(): LiveData<AppState> =
         liveDataForViewToObserve
 

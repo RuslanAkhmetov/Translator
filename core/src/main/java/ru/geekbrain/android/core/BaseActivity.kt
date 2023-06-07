@@ -1,16 +1,15 @@
 package ru.geekbrain.android.core
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.View
-import ru.geekbrain.android.model.AppState
 import androidx.appcompat.app.AppCompatActivity
 import ru.geekbrain.android.core.databinding.LoadingLayoutBinding
 import ru.geekbrain.android.core.viewmodel.BaseViewModel
 import ru.geekbrain.android.core.viewmodel.Interactor
-import ru.geekbrain.android.model.Word
+import ru.geekbrain.android.model.AppState
+import ru.geekbrain.android.model.userdata.Word
 import ru.geekbrain.android.utils.AlertDialogFragment
-import ru.geekbrain.android.utils.isOnline
+import ru.geekbrain.android.utils.online.OnlineLiveData
 
 private const val DIALOG_FRAGMENT_TAG = "74a54328-5d62-46bf-ab6b-cbf5d8c79522"
 
@@ -21,17 +20,28 @@ abstract class BaseActivity<T : AppState, I : Interactor<T>> :
 
     abstract val model: BaseViewModel<T>
 
-    protected var isNetworkAvailable = false
+    private var isNetworkAvailable:Boolean = false
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
-        isNetworkAvailable = isOnline(applicationContext)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        subscribeToNetworkChange()
+    }
+
+    private fun subscribeToNetworkChange(){
+        OnlineLiveData(this).observe(
+            this
+        ) {
+            isNetworkAvailable = it
+            if (!isNetworkAvailable) {
+                showNoInternetConnectionDialog()
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
         binding = LoadingLayoutBinding.inflate(layoutInflater)
-        isNetworkAvailable = isOnline(applicationContext)
         if (!isNetworkAvailable && isDialogNull()) {
             showNoInternetConnectionDialog()
         }

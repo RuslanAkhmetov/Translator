@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import ru.geekbrain.android.model.Word
+import ru.geekbrain.android.model.userdata.Word
 import ru.geekbrain.android.repository.convertMeaningsToString
 import ru.geekbrains.android.translator.R
 
@@ -14,10 +14,10 @@ class MainAdapter(
 ) : RecyclerView.Adapter<MainAdapter.RecyclerItemViewHolder>() {
 
 
-    private var words: List<Word> = arrayListOf()
+    private var word: List<Word> = arrayListOf()
 
-    fun setData(words: List<Word>) {
-        this.words = words
+    fun setData(word: List<Word>) {
+        this.word = word
         notifyDataSetChanged()
     }
 
@@ -34,7 +34,7 @@ class MainAdapter(
         position: Int,
         payloads: MutableList<Any>
     ) {
-        holder.bind(words[position])
+        holder.bind(word[position])
     }
 
 
@@ -60,11 +60,11 @@ class MainAdapter(
 
 
     override fun onBindViewHolder(holder: RecyclerItemViewHolder, position: Int) {
-        holder.bind(words.get(position))
+        holder.bind(word.get(position))
     }
 
     override fun getItemCount(): Int {
-        return words.size
+        return word.size
     }
 
 

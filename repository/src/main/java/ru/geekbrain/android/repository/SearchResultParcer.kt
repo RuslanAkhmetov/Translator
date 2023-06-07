@@ -1,10 +1,32 @@
 package ru.geekbrain.android.repository
 
 import ru.geekbrain.android.model.AppState
-import ru.geekbrain.android.model.Meaning
-import ru.geekbrain.android.model.Translation
-import ru.geekbrain.android.model.Word
+import ru.geekbrain.android.model.dto.MeaningDto
+import ru.geekbrain.android.model.dto.TranslationDto
+import ru.geekbrain.android.model.dto.WordDto
+import ru.geekbrain.android.model.userdata.Meaning
+import ru.geekbrain.android.model.userdata.TranslatedMeaning
+import ru.geekbrain.android.model.userdata.Word
 import ru.geekbrain.android.repository.room.HistoryEntity
+
+fun mapSearchResultToResult(searchResults: List<WordDto>): List<Word> {
+    return searchResults.map {
+        var meanings: List<Meaning> = listOf()
+        it.meanings?.let {
+            meanings = it.map { meaningDto ->
+                Meaning(
+                    TranslatedMeaning(
+                        meaningDto?.translation?.text ?: ""
+                    ),
+                    meaningDto.partOfSpeechCode,
+                    meaningDto?.imageUrl ?: ""
+                )
+
+            }
+        }
+        Word(it.id,it.text ?: "", meanings)
+    }
+}
 
 fun parseSearchResults(state: AppState): AppState {
     val newSearchResults = arrayListOf<Word>()
@@ -27,7 +49,7 @@ fun parseLocalSearchResults(appState: AppState): AppState {
     return AppState.Success(mapResult(appState, false))
 }
 
-fun mapResult(appState: AppState, onLine: Boolean): List<Word>? {
+fun mapResult(appState: AppState, onLine: Boolean): List<Word> {
     val newSearchResults = arrayListOf<Word>()
     when (appState) {
         is AppState.Success -> {
@@ -43,15 +65,15 @@ fun getSuccessResultData(
     online: Boolean,
     newSearchResults: ArrayList<Word>
 ) {
-    val wordList: List<Word> = appState.words as List<Word>
-    if (wordList.isNotEmpty()) {
+    val wordDtoLists: List<Word> = appState.words as List<Word>
+    if (wordDtoLists.isNotEmpty()) {
         if (online) {
-            for (result in wordList) {
+            for (result in wordDtoLists) {
                 parseOnlineResult(result, newSearchResults)
             }
         } else {
-            for (result in wordList) {
-                newSearchResults.add(Word(result.id, result.meanings, result.text))
+            for (result in wordDtoLists) {
+                newSearchResults.add(Word(result.id, result.text, result.meanings))
             }
         }
     }
@@ -59,84 +81,77 @@ fun getSuccessResultData(
 
 
 fun parseOnlineResult(result: Word, newSearchResults: ArrayList<Word>) {
-    if (result.id != 0 && !result.meanings.isNullOrEmpty()) {
-        val newMeaning = arrayListOf<Meaning>()
-        for (meaning in result.meanings!!) {
-            if (meaning.translation != null && !meaning.translation.text.isNullOrBlank()) {
-                newMeaning.add(
-                    Meaning(
-                        meaning.id,
-                        meaning.imageUrl,
-                        meaning.partOfSpeechCode,
-                        meaning.previewUrl,
-                        meaning.soundUrl,
-                        meaning.transcription,
-                        meaning.translation
-                    )
+    if (result.text.isNotBlank() && result.meanings.isNotEmpty()) {
+        val newMeanings = arrayListOf<Meaning>()
+        newMeanings.addAll(result.meanings.filter {
+            it.translatedMeaning.translatedMeaning.isNotBlank()
+        })
+        if (newMeanings.isNotEmpty()) {
+            newSearchResults.add(
+                Word(
+                    result.id,
+                    result.text,
+                    newMeanings
                 )
-            }
-            if (newMeaning.isNotEmpty()) {
-                newSearchResults.add(Word(result.id, newMeaning, result.text))
-            }
+            )
         }
     }
 }
 
 
-fun parseResult(word: Word, newSearchResults: ArrayList<Word>) {
-    if (!word.text.isNullOrBlank() && !word.meanings.isNullOrEmpty()) {
+fun parseResult(wordDto: Word, newSearchResults: ArrayList<Word>) {
+    if (!wordDto.text.isNullOrBlank() && !wordDto.meanings.isNullOrEmpty()) {
         val newMeanings = arrayListOf<Meaning>()
-        for (meaning in word.meanings!!) {
-            if (meaning.translation != null && !meaning.translation.text.isNullOrBlank()) {
+        for (meaning in wordDto.meanings!!) {
+            if (meaning.translatedMeaning != null && !meaning.translatedMeaning.translatedMeaning.isNullOrBlank()) {
                 newMeanings.add(
                     Meaning(
-                        meaning.id,
-                        meaning.imageUrl,
+                        meaning.translatedMeaning,
                         meaning.partOfSpeechCode,
-                        meaning.previewUrl,
-                        meaning.soundUrl,
-                        meaning.transcription,
-                        meaning.translation
+                        meaning.imageUrl,
                     )
                 )
             }
         }
         if (newMeanings.isNotEmpty()) {
-            newSearchResults.add(Word(word.id, newMeanings, word.text))
+            newSearchResults.add(Word(wordDto.id, wordDto.text, newMeanings))
         }
     }
 
 }
 
 
-fun mapHistoryEntityToSearchResult(wordList: List<HistoryEntity>): List<Word> {
-    val words = ArrayList<Word>()
+fun mapHistoryEntityToSearchResult(wordList: List<HistoryEntity>): List<WordDto> {
+    val wordDtos = ArrayList<WordDto>()
     if (!wordList.isNullOrEmpty()) {
         for (word in wordList) {
-            words.add(Word(word.id, null, word.word!!))
+            wordDtos.add(WordDto(word.id, null, word.word!!))
         }
     }
-    return words
+    return wordDtos
 }
 
-fun mapHistotyAll(all: List<HistoryEntity>): List<Word> {
-    val words = ArrayList<Word>()
+fun mapHistotyAll(all: List<HistoryEntity>): List<WordDto> {
+    val wordDtos = ArrayList<WordDto>()
     if (!all.isNullOrEmpty()) {
         for (word in all) {
-            words.add(
-                Word(
+            wordDtos.add(
+                WordDto(
                     word.id,
                     word.description?.let {
-                    listOf<Meaning>(
-                        Meaning(0, "", "", "", "", "",
-                             Translation("", it) ))
-                                          },
-                        word.word!!
-                    )
+                        listOf<MeaningDto>(
+                            MeaningDto(
+                                0, "", "", "", "", "",
+                                TranslationDto("", it)
+                            )
+                        )
+                    },
+                    word.word!!
                 )
+            )
         }
     }
-    return words
+    return wordDtos
 }
 
 fun convertWordToEntity(appState: AppState): HistoryEntity? {
@@ -162,7 +177,7 @@ fun convertMeaningsToString(meanings: List<Meaning>): String {
                 "%s%s%s%s",
                 meaning.partOfSpeechCode,
                 " - ",
-                meaning.translation?.text,
+                meaning.translatedMeaning.translatedMeaning,
                 "; "
             )
         } else {
@@ -170,7 +185,7 @@ fun convertMeaningsToString(meanings: List<Meaning>): String {
                 "%s%s%s%s",
                 meaning.partOfSpeechCode,
                 " - ",
-                meaning.translation?.text,
+                meaning.translatedMeaning.translatedMeaning,
                 "."
             )
         }
