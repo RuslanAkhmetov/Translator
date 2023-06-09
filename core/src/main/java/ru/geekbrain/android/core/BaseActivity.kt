@@ -20,11 +20,11 @@ abstract class BaseActivity<T : AppState, I : Interactor<T>> :
 
     abstract val model: BaseViewModel<T>
 
-    private var isNetworkAvailable:Boolean = false
-
+    protected var isNetworkAvailable:Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = LoadingLayoutBinding.inflate(layoutInflater)
         subscribeToNetworkChange()
     }
 
@@ -33,19 +33,12 @@ abstract class BaseActivity<T : AppState, I : Interactor<T>> :
             this
         ) {
             isNetworkAvailable = it
-            if (!isNetworkAvailable) {
+            if (!isNetworkAvailable ) {
                 showNoInternetConnectionDialog()
             }
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        binding = LoadingLayoutBinding.inflate(layoutInflater)
-        if (!isNetworkAvailable && isDialogNull()) {
-            showNoInternetConnectionDialog()
-        }
-    }
 
     protected fun renderData(appState: T) {
         when (appState) {
@@ -56,7 +49,7 @@ abstract class BaseActivity<T : AppState, I : Interactor<T>> :
                         AlertDialogFragment.newInstance(
                             getString(R.string.dialog_tittle_sorry),
                             getString(R.string.empty_server_response_on_success)
-                        )
+                        ).show(supportFragmentManager, DIALOG_FRAGMENT_TAG)
                     } else {
                         setDataToAdapter(it)
                     }
@@ -86,11 +79,11 @@ abstract class BaseActivity<T : AppState, I : Interactor<T>> :
 
     abstract fun setDataToAdapter(word: List<Word>)
 
-    private fun showNoInternetConnectionDialog() {
+    protected fun showNoInternetConnectionDialog() {
         AlertDialogFragment.newInstance(
             getString(R.string.dialog_title_device_is_offline),
             getString(R.string.dialog_message_device_is_offline)
-        )
+        ).show(supportFragmentManager, DIALOG_FRAGMENT_TAG)
     }
 
     private fun isDialogNull(): Boolean =

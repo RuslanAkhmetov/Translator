@@ -1,24 +1,19 @@
 package ru.geekbrain.android.translator.di
 
 import androidx.room.Room
+import coil.ImageLoader
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
-
-import ru.geekbrain.android.model.dto.WordDto
-import ru.geekbrain.android.repository.RetrofitImpl
-import ru.geekbrain.android.repository.RoomDataBaseImpl
-import ru.geekbrain.android.repository.RepositoryImpl
-import ru.geekbrain.android.repository.Repository
-import ru.geekbrain.android.repository.RepositoryLocal
-import ru.geekbrain.android.repository.RepositoryImplementationLocal
-import ru.geekbrain.android.repository.room.HistoryDataBase
-import ru.geekbrain.android.historyscreen.view.history.HistoryInteractor
-import ru.geekbrain.android.historyscreen.view.history.HistoryViewModel
-import ru.geekbrain.android.translator.view.main.MainInteractor
-import ru.geekbrain.android.translator.view.main.MainViewModel
 import org.koin.dsl.module
 import ru.geekbrain.android.historyscreen.view.history.HistoryActivity
-import ru.geekbrain.android.translator.view.main.MainActivity
+import ru.geekbrain.android.historyscreen.view.history.HistoryInteractor
+import ru.geekbrain.android.historyscreen.view.history.HistoryViewModel
+import ru.geekbrain.android.model.dto.WordDto
+import ru.geekbrain.android.repository.*
+import ru.geekbrain.android.repository.room.HistoryDataBase
+import ru.geekbrain.android.translator.view.descriptionscreen.DescriptionActivity
+import ru.geekbrain.android.translator.view.main.MainInteractor
+import ru.geekbrain.android.translator.view.main.MainViewModel
 
 val application = module {
     single { Room.databaseBuilder(get(), HistoryDataBase::class.java, "HistoryDB").build() }
@@ -36,16 +31,22 @@ val application = module {
 
 
 val mainScreen = module {
-    scope(named<MainActivity>()) {
-        scoped { MainInteractor(get(), get()) }
+    //scope(named<MainActivity>()) {                   //не сохраняется создается новая viewmodel после поворота экрана
+        single { MainInteractor(get(), get()) }
         viewModel { MainViewModel(get()) }
-    }
+    //}
 }
 
 val historyScreen = module {
     scope(named<HistoryActivity>()) {
         scoped { HistoryInteractor(get(), get()) }
         viewModel { HistoryViewModel(get()) }
+    }
+}
+
+val descriptionScreen = module{
+    scope(named<DescriptionActivity>()) {
+        scoped { ImageLoader(get()) }
     }
 }
 

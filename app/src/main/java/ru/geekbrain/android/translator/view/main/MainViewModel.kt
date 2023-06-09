@@ -1,5 +1,6 @@
 package ru.geekbrain.android.translator.view.main
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,7 +21,6 @@ class MainViewModel (private val interactor: MainInteractor)
         _mutableLiveData.value = AppState.Loading(null)
         cancelJob()
         viewModelCoroutineScope.launch { startInteractor(searchText, isOnline) }
-
     }
 
     private suspend fun startInteractor(searchText: String, online: Boolean) =
@@ -34,8 +34,8 @@ class MainViewModel (private val interactor: MainInteractor)
 
     override fun onCleared() {
         _mutableLiveData.value = AppState.Success(null)
+        Log.i("TAG", "onCleared: ")
         super.onCleared()
     }
-
 
 }

@@ -2,12 +2,17 @@ package ru.geekbrain.android.translator.view.descriptionscreen
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.RenderEffect
+import android.graphics.Shader
+import android.os.Build
 import android.os.Bundle
 import android.widget.ImageView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import coil.ImageLoader
 import coil.request.LoadRequest
 import coil.transform.CircleCropTransformation
+import org.koin.android.scope.currentScope
 import ru.geekbrain.android.utils.AlertDialogFragment
 import ru.geekbrain.android.utils.online.OnlineLiveData
 import ru.geekbrains.android.translator.R
@@ -32,17 +37,15 @@ class DescriptionActivity : AppCompatActivity() {
         }
     }
 
-    lateinit var binding: ActivityDescriptionBinding
+    private lateinit var binding: ActivityDescriptionBinding
 
-    lateinit var imageLoader: ImageLoader
+    val imageLoader: ImageLoader by currentScope.inject()
 
-
-
+    @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDescriptionBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        imageLoader = ImageLoader(this)
 
         setActionHomeButtonAsUp()
         setData()
@@ -57,26 +60,27 @@ class DescriptionActivity : AppCompatActivity() {
         imageLoader.shutdown()
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     private fun startLoadingOrShowError() {
         OnlineLiveData(this).observe(
-            this,
-            {
-                if (it)
-                    setData()
-                else {
-                    AlertDialogFragment.newInstance(
-                        getString(R.string.dialog_title_device_is_offline),
-                        getString(R.string.dialog_message_device_is_offline),
-                    ).show(
-                        supportFragmentManager,
-                        DIALOG_FRAGMENT_TAG
-                    )
-                    stopRefreshAnimatorIfNeeded()
-                }
+            this
+        ) {
+            if (it)
+                setData()
+            else {
+                AlertDialogFragment.newInstance(
+                    getString(R.string.dialog_title_device_is_offline),
+                    getString(R.string.dialog_message_device_is_offline),
+                ).show(
+                    supportFragmentManager,
+                    DIALOG_FRAGMENT_TAG
+                )
+                stopRefreshAnimatorIfNeeded()
             }
-    )
+        }
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     private fun setData() {
         val bundle = intent.extras
         binding.descriptionHeader.text = bundle?.getString(WORD_EXTRA)
@@ -103,12 +107,15 @@ class DescriptionActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     private fun useCoilToLoadPhoto(imageView: ImageView, imageLink: String){
+        val blurEffect = RenderEffect.createBlurEffect(16f, 16f, Shader.TileMode.MIRROR)
         val request = LoadRequest.Builder(this)
             .data("https:$imageLink")
             .target(
                 onStart = {},
                 onSuccess = {result ->
+                    imageView.setRenderEffect(blurEffect)
                     imageView.setImageDrawable(result)
                 },
                 onError = {

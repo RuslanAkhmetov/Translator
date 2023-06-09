@@ -9,12 +9,12 @@ import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import ru.geekbrains.android.translator.databinding.SearchDialogFragmentBinding
 
-class SearchDialogFragment: BottomSheetDialogFragment() {
+class SearchDialogFragment(private var searchWord: String=""): BottomSheetDialogFragment() {
 
     companion object{
-        fun newInstance(): SearchDialogFragment =
-                SearchDialogFragment()
-
+        fun newInstance(searchWord: String): SearchDialogFragment {
+            return SearchDialogFragment(searchWord)
+        }
     }
 
     private var _binding: SearchDialogFragmentBinding? = null
@@ -57,6 +57,9 @@ class SearchDialogFragment: BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = SearchDialogFragmentBinding.inflate(inflater, container,false)
+        if (searchWord.isNotEmpty()) {
+            binding.searchEditText.text = Editable.Factory.getInstance().newEditable(searchWord)
+        }
         return binding.root
     }
 
