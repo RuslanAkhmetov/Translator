@@ -4,6 +4,8 @@ plugins {
     id 'kotlin-kapt'
 }
 
+
+
 android {
     namespace Config.application_id
     compileSdk Config.compile_sdk
@@ -66,10 +68,14 @@ dependencies {
     implementation Design.material
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
+
     //Test
     testImplementation TestImpl.junit
+    testImplementation Koin.koin_test
+    //testImplementation "io.insert-koin:koin-test-junit4:3.4.0"
     androidTestImplementation TestImpl.runner
     androidTestImplementation TestImpl.espresso
+
 
     //SwipeRefreshLayout
     implementation Swipe.swiperefreshlayout

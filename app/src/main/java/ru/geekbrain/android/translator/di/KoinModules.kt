@@ -32,8 +32,8 @@ val application = module {
 
 val mainScreen = module {
     //scope(named<MainActivity>()) {                   //не сохраняется создается новая viewmodel после поворота экрана
-        single { MainInteractor(get(), get()) }
-        viewModel { MainViewModel(get()) }
+    single <MainInteractor>{ MainInteractor(get(), get()) }
+    viewModel { MainViewModel(get()) }
     //}
 }
 

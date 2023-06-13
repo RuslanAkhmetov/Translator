@@ -42,7 +42,7 @@ object Versions{
     const val adapterCoroutines = "0.9.2"
 
     //Koin
-    const val koinAndroid = "2.1.6"
+    const val koinAndroid = "3.4.0"
     const val koinViewModel = "2.1.6"
 
     //Coil
@@ -58,6 +58,7 @@ object Versions{
     const val jUnit = "4.13.2"
     const val runner = "1.1.5"
     const val espressoCore = "3.5.1"
+    const val mockito = "2.19.0"
 
     //SwipeRefreshLayout
     const val swiperefreshlayout = "1.1.0"
@@ -94,8 +95,9 @@ object Retrofit {
 }
 
 object Koin {
-    const val koin_android = "io.insert-koin:koin-android:${Versions.koinAndroid}"
+    const val koin_android = "io.insert-koin:koin-android:${Versions.koinViewModel}"
     const val koin_view_model = "io.insert-koin:koin-android-viewmodel:${Versions.koinViewModel}"
+    const val koin_test = "io.insert-koin:koin-test-junit4:${Versions.koinAndroid}"
 }
 
 object Coil {
@@ -125,4 +127,6 @@ object TestImpl {
     const val junit = "junit:junit:${Versions.jUnit}"
     const val runner = "androidx.test:runner:${Versions.runner}"
     const val espresso = "androidx.test.espresso:espresso-core:${Versions.espressoCore}"
+    const val mockito = "org.mockito:mockito-core:${Versions.mockito}"
+
 }
