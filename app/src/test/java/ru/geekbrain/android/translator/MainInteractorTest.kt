@@ -1,24 +1,60 @@
 package ru.geekbrain.android.translator
 
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.times
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Test
-import org.koin.java.KoinJavaComponent.inject
-import ru.geekbrain.android.model.AppState
+import org.mockito.Mock
+import org.mockito.Mockito
+import org.mockito.MockitoAnnotations
+import ru.geekbrain.android.model.dto.*
+import ru.geekbrain.android.repository.*
 import ru.geekbrain.android.translator.view.main.MainInteractor
 
 class MainInteractorTest {
-    @Test
-    suspend fun MainInteractor_CorrectAnswer_ReturnTrue() {
-        val interactor: MainInteractor by inject(MainInteractor::class.java)
-        val appState = interactor.getWord("тест", true)
-        when (appState) {
-            is AppState.Success -> {
-                assertEquals(appState.words?.get(0)?.text, "test")
-            }
-            else -> assertFalse(true)
-        }
+
+    private val word = "Text"
+
+
+    lateinit var interactor: MainInteractor
+
+    @Mock
+    lateinit var localRepository: RepositoryLocal<List<WordDto>>
+
+    @Mock
+    lateinit var mockedRepository:Repository<List<WordDto>>
+
+    @Before
+    fun setUp() {
+        MockitoAnnotations.openMocks(this)
     }
+
+
+
+    private val listWordDto = listOf(WordDto(
+        1, listOf(
+            MeaningDto(
+                1, "", "", "", "", "",
+                TranslationDto("", "TEXT")
+            )
+        ), ""
+    ))
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        @Test
+        fun mainInteractor_CorrectAnswer() {
+            runTest {
+
+                interactor = MainInteractor(mockedRepository, localRepository)
+                Mockito.`when`(mockedRepository.getWord(word)).thenReturn(listWordDto)
+
+                interactor.getWord(word, true)
+
+                Mockito.verify(localRepository, times(1)).saveToDB(any())
+            }
+        }
 
 }
