@@ -10,9 +10,11 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
+import ru.geekbrain.android.model.AppState
 import ru.geekbrain.android.model.dto.*
 import ru.geekbrain.android.repository.*
 import ru.geekbrain.android.translator.view.main.MainInteractor
+import kotlin.test.assertTrue
 
 class MainInteractorTest {
 
@@ -25,7 +27,7 @@ class MainInteractorTest {
     lateinit var localRepository: RepositoryLocal<List<WordDto>>
 
     @Mock
-    lateinit var mockedRepository:Repository<List<WordDto>>
+    lateinit var mockedRepository: Repository<List<WordDto>>
 
     @Before
     fun setUp() {
@@ -33,28 +35,41 @@ class MainInteractorTest {
     }
 
 
+    private val listWordDto = listOf(
+        WordDto(
+            1, listOf(
+                MeaningDto(
+                    1, "", "", "", "", "",
+                    TranslationDto("", "TEXT")
+                )
+            ), ""
+        )
+    )
 
-    private val listWordDto = listOf(WordDto(
-        1, listOf(
-            MeaningDto(
-                1, "", "", "", "", "",
-                TranslationDto("", "TEXT")
-            )
-        ), ""
-    ))
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun mainInteractor_CorrectAnswer() {
+        runTest {
 
-        @OptIn(ExperimentalCoroutinesApi::class)
-        @Test
-        fun mainInteractor_CorrectAnswer() {
-            runTest {
+            interactor = MainInteractor(mockedRepository, localRepository)
+            Mockito.`when`(mockedRepository.getWord(word)).thenReturn(listWordDto)
 
-                interactor = MainInteractor(mockedRepository, localRepository)
-                Mockito.`when`(mockedRepository.getWord(word)).thenReturn(listWordDto)
+            interactor.getWord(word, true)
 
-                interactor.getWord(word, true)
-
-                Mockito.verify(localRepository, times(1)).saveToDB(any())
-            }
+            Mockito.verify(localRepository, times(1)).saveToDB(any())
         }
+    }
+
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun mainInteractor_NoCorrectAnswer() {
+        runTest {
+
+            interactor = MainInteractor(mockedRepository, localRepository)
+
+            assertTrue(interactor.getWord(word, true) is AppState.Error)
+        }
+    }
 
 }

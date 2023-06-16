@@ -5,6 +5,7 @@ import ru.geekbrain.android.model.dto.WordDto
 import ru.geekbrain.android.repository.Repository
 import ru.geekbrain.android.repository.RepositoryLocal
 import ru.geekbrain.android.core.viewmodel.Interactor
+import ru.geekbrain.android.model.userdata.Word
 import ru.geekbrain.android.repository.mapSearchResultToResult
 
 class MainInteractor(
@@ -15,10 +16,16 @@ class MainInteractor(
     override suspend fun getWord(searchText: String, fromRemoteSource: Boolean): AppState {
         val appState: AppState
         if (fromRemoteSource) {
-            appState = AppState.Success(mapSearchResultToResult(remoteRepository.getWord(searchText)))
-            localRepository.saveToDB(appState)
+            val response: List<Word> = mapSearchResultToResult(remoteRepository.getWord(searchText))
+            if (!response.isNullOrEmpty()) {
+                appState = AppState.Success(response)
+                localRepository.saveToDB(appState)
+            } else {
+                appState = AppState.Error(Throwable("Response is empty"))
+            }
         } else {
-            appState = AppState.Success(mapSearchResultToResult(localRepository.getWord(searchText)))
+            appState =
+                AppState.Success(mapSearchResultToResult(localRepository.getWord(searchText)))
         }
         return appState
     }
